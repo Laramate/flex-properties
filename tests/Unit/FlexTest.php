@@ -1,14 +1,14 @@
 <?php
 
-namespace LaravelFlexProperties\Tests\Unit;
+namespace Laramate\FlexProperties\Tests\Unit;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use LaravelFlexProperties\Exceptions\FlexPropertyException;
-use LaravelFlexProperties\Flex;
-use LaravelFlexProperties\Tests\TestCase;
-use LaravelFlexProperties\Types\JsonFlexProperty;
-use LaravelFlexProperties\Types\StringFlexProperty;
-use LaravelFlexProperties\Types\TextFlexProperty;
+use Laramate\FlexProperties\Exceptions\FlexPropertyException;
+use Laramate\FlexProperties\Flex;
+use Laramate\FlexProperties\Tests\TestCase;
+use Laramate\FlexProperties\Types\JsonFlexProperty;
+use Laramate\FlexProperties\Types\StringFlexProperty;
+use Laramate\FlexProperties\Types\TextFlexProperty;
 
 class FlexTest extends TestCase
 {

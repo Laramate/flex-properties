@@ -1,9 +1,9 @@
 <?php
 
-namespace LaravelFlexProperties;
+namespace Laramate\FlexProperties;
 
-use LaravelFlexProperties\Exceptions\FlexPropertyException;
-use LaravelFlexProperties\Types\FlexProperty;
+use Laramate\FlexProperties\Exceptions\FlexPropertyException;
+use Laramate\FlexProperties\Types\FlexProperty;
 
 class Flex
 {

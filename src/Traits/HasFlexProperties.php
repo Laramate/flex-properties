@@ -1,9 +1,9 @@
 <?php
 
-namespace LaravelFlexProperties\Traits;
+namespace Laramate\FlexProperties\Traits;
 
-use LaravelFlexProperties\Exceptions\FlexPropertyException;
-use LaravelFlexProperties\Flex;
+use Laramate\FlexProperties\Exceptions\FlexPropertyException;
+use Laramate\FlexProperties\Flex;
 use Mindtwo\DynamicMutators\Facades\Handler;
 
 trait HasFlexProperties
@@ -338,7 +338,6 @@ trait HasFlexProperties
      * Get a reference to flex property object.
      *
      * @param string $name
-     *
      * @throws FlexPropertyException
      *
      * @return FlexProperty

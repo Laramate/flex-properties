@@ -1,8 +1,8 @@
 <?php
 
-namespace LaravelFlexProperties\Tests;
+namespace Laramate\FlexProperties\Tests;
 
-use LaravelFlexProperties\Providers\FlexPropertyServiceProvider;
+use Laramate\FlexProperties\Providers\FlexPropertyServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {

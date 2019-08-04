@@ -10,9 +10,9 @@ return [
     */
 
     'types' => [
-        'string' => LaravelFlexProperties\Types\StringFlexProperty::class,
-        'text'   => LaravelFlexProperties\Types\TextFlexProperty::class,
-        'json'   => LaravelFlexProperties\Types\JsonFlexProperty::class,
+        'string' => Laramate\FlexProperties\Types\StringFlexProperty::class,
+        'text'   => Laramate\FlexProperties\Types\TextFlexProperty::class,
+        'json'   => Laramate\FlexProperties\Types\JsonFlexProperty::class,
     ],
 
 ];

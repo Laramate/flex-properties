@@ -1,13 +1,13 @@
 <?php
 
-namespace LaravelFlexProperties\Tests\Feature;
+namespace Laramate\FlexProperties\Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use LaravelFlexProperties\Model;
-use LaravelFlexProperties\Tests\TestCase;
-use LaravelFlexProperties\Types\JsonFlexProperty;
-use LaravelFlexProperties\Types\StringFlexProperty;
-use LaravelFlexProperties\Types\TextFlexProperty;
+use Laramate\FlexProperties\Model;
+use Laramate\FlexProperties\Tests\TestCase;
+use Laramate\FlexProperties\Types\JsonFlexProperty;
+use Laramate\FlexProperties\Types\StringFlexProperty;
+use Laramate\FlexProperties\Types\TextFlexProperty;
 
 class ModelTest extends TestCase
 {
