@@ -191,8 +191,10 @@ trait HasFlexProperties
      */
     protected function getFlexPropertyFromDb(string $name, string $locale = null)
     {
-        return Flex::factory($this->getFlexPropertyType($name))
-            ->where('linkable_type', static::class)
+        $type = $this->getFlexPropertyType($name);
+
+        return Flex::factory($type)
+            ->where('linkable_type', 'flex_' . $type)
             ->where('linkable_id', $this->{'id'})
             ->where('name', $name)
             ->where('locale', $locale ?? $this->currentLocale())
@@ -317,6 +319,7 @@ trait HasFlexProperties
      */
     public function loadFlexProperties()
     {
+        dd('dfdf');
         collect($this->flex_properties)->flip()->map(function ($value, $type) {
             return Flex::factory($type)
                     ->where('linkable_id', $this->{'id'})
