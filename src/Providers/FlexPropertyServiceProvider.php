@@ -2,12 +2,7 @@
 
 namespace Laramate\FlexProperties\Providers;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
-use Laramate\StructuredDocument\Models\Block;
-use Laramate\StructuredDocument\Models\Document;
-use Laramate\StructuredDocument\Models\Layer;
 
 class FlexPropertyServiceProvider extends ServiceProvider
 {
@@ -18,26 +13,10 @@ class FlexPropertyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootMorphMap();
-
         if ($this->app->runningInConsole()) {
             $this->registerPublishing();
             $this->loadMigrationsFrom(__DIR__ . '/../Migrations');
         }
-    }
-
-    /**
-     * Create morph maps for the structured document models.
-     */
-    protected function bootMorphMap()
-    {
-        $config = Config::get('flex-properties.types');
-
-        $map = collect($config)->mapWithKeys(function ($item, $key) {
-            return ['flex_' . $key => $item];
-        });
-
-        Relation::morphMap($map->toArray());
     }
 
     /**

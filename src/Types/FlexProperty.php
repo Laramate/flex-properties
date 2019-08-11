@@ -4,8 +4,6 @@ namespace Laramate\FlexProperties\Types;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Facades\Config;
-use Laramate\FlexProperties\Flex;
 
 abstract class FlexProperty extends Model
 {
@@ -26,18 +24,6 @@ abstract class FlexProperty extends Model
     public function linkable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    public function getTypeAttribute()
-    {
-        $config = Config::get('flex-properties.types');
-
-        return Collect($config)->flip()->get(static::class);
-    }
-
-    public function getLinkableKeyAttribute()
-    {
-        return 'flex_' . $this->type;
     }
 
     /**
