@@ -64,8 +64,8 @@ trait HasFlexProperties
         collect($this->flex_properties)->flip()->each(function ($item, $type) use (&$query) {
             $property = Flex::factory($type);
             $tableAlias = 'flex_tbl_'.$type;
-            $query->leftJoin("'".$property->getTable()."'".' AS '.$tableAlias, function ($join) use ($type, $tableAlias) {
-                $join->on($tableAlias.'.linkable_id', "'".$this->getTable()."'".'.id');
+            $query->leftJoin($property->getTable().' AS '.$tableAlias, function ($join) use ($type, $tableAlias) {
+                $join->on($tableAlias.'.linkable_id', $this->getTable().'.id');
                 $join->where($tableAlias.'.linkable_type', "'".static::class."'");
             });
         });
