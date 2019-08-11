@@ -55,6 +55,7 @@ trait HasFlexProperties
         });
 
         static::addGlobalScope('flex-property-join', function ($builder) {
+            return $builder;
             $builder->flexProperties();
         });
     }
