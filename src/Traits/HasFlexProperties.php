@@ -54,19 +54,22 @@ trait HasFlexProperties
             $model->storeFlexProperties();
         });
 
+        /*
         static::addGlobalScope('flex-property-join', function ($builder) {
             $builder->flexProperties();
         });
+        */
     }
 
     public function scopeFlexProperties($query)
     {
         collect($this->flex_properties)->flip()->each(function ($item, $type) use (&$query) {
             $property = Flex::factory($type);
-            $tableAlias = 'flex_tbl_'.$type;
-            $query->leftJoin($property->getTable().' AS '.$tableAlias, function ($join) use ($type, $tableAlias) {
-                $join->on($tableAlias.'.linkable_id', $this->getTable().'.id');
-                $join->where($tableAlias.'.linkable_type', "'".static::class."'");
+            $flexTable = $property->getTable();
+
+            $query->leftJoin($flexTable, function ($join) use ($type, $flexTable) {
+                $join->on($flexTable.'.linkable_id', $this->getTable().'.id');
+                $join->where($flexTable.'.linkable_type', "'flex_".$type."'");
             });
         });
 
@@ -297,7 +300,7 @@ trait HasFlexProperties
     {
         collect($this->flex_objects)->flatten()->each(function ($property) {
             $property->forceFill([
-                'linkable_type' => static::class,
+                'linkable_type' => $property->linkable_key,
                 'linkable_id'   => $this->{'id'},
             ])->save();
         });
@@ -317,7 +320,7 @@ trait HasFlexProperties
         collect($this->flex_properties)->flip()->map(function ($value, $type) {
             return Flex::factory($type)
                     ->where('linkable_id', $this->{'id'})
-                    ->where('linkable_type', static::class)
+                    ->where('linkable_type', 'flex_'.$type)
                     ->get();
         })
             ->filter()
@@ -348,24 +351,5 @@ trait HasFlexProperties
         return $this->getFlexProperty(
             $this->hasFlexPropertyOrFail($name)
         );
-    }
-
-    public function flexWhere($name, $operator, $value = null)
-    {
-        $type = $this->getFlexPropertyType(
-            $this->hasFlexPropertyOrFail($name)
-        );
-
-        if (is_null($value)) {
-            $value = $operator;
-            $operator = '=';
-        }
-
-        return function ($query) use ($type, $operator, $value, $name) {
-            $query->where('flex_tbl_'.$type.'.value', $value);
-            $query->where('flex_tbl_'.$type.'.name', $name);
-
-            return $query;
-        };
     }
 }
