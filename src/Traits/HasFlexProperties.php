@@ -4,7 +4,6 @@ namespace Laramate\FlexProperties\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Laramate\FlexProperties\Exceptions\FlexPropertyException;
 use Laramate\FlexProperties\Flex;
 use Laramate\FlexProperties\Interfaces\FlexProperty;
@@ -30,10 +29,7 @@ trait HasFlexProperties
      *
      * @var array
      */
-    protected $flex_objects = [];
-    protected $flex_joins = [];
-    protected $next_operation = [];
-
+    protected $flex_joins;
     protected $flex_properties;
 
     /**
@@ -84,7 +80,7 @@ trait HasFlexProperties
      */
     protected function hasFlexProperty(string $name): bool
     {
-        return array_key_exists($name, $this->flex_properties);
+        return array_key_exists($name, $this->getFlexProperties());
     }
 
     /**
@@ -106,37 +102,20 @@ trait HasFlexProperties
     }
 
     /**
-     * Get FlexProperty type.
-     *
-     * @param string $name
-     *
-     * @throws FlexPropertyException
-     *
-     * @return string
-     */
-    protected function getFlexPropertyType(string $name): string
-    {
-        $this->hasFlexPropertyOrFail($name);
-
-        return Flex::typeOrFail($this->flex_properties[$name]);
-    }
-
-    /**
      * Return a reference to a flex property object.
-     *
-     * @param string      $name
-     * @param string|null $locale
-     *
-     * @return mixed
      */
-    protected function &flexPropertyReference(string $name, string $locale = null)
+    protected function &getFlexProperty(string $name)
     {
-        return $this->flex_objects[$locale ?? $this->currentLocale()][$name];
+        return $this->getFlexProperties()[$name];
     }
 
-    protected function operationFinished()
+    protected function &getFlexProperties(): array
     {
-        $this->next_operation = [];
+        if (empty($this->flex_properties)) {
+            $this->flex_properties = $this->composeFlexProperties();
+        }
+
+        return $this->flex_properties;
     }
 
     /**
@@ -150,49 +129,21 @@ trait HasFlexProperties
      */
     public function getFlexPropertyValue(string $name)
     {
-        return optional($this->getFlexProperty($name))->value;
+        return $this->getFlexProperty($name)->getValue();
     }
 
-    /**
-     * @param string $name
-     *
-     * @throws FlexPropertyException
-     *
-     * @return mixed
-     */
-    public function getFlexProperty(string $name)
+    protected function composeFlexProperties(): array
     {
-
-        $this->hasFlexPropertyOrFail($name);
-        $locale = $this->currentLocale();
-
-        if (! $this->hasFlexObject($name, $locale)) {
-            $property = $this->getFlexPropertyFromDb($name, $locale);
-            $this->flex_objects[$locale][$name] = $property ?? $this->makeFlexObject($name, $locale);
-        }
-
-        return $this->flexPropertyReference($name, $locale);
-    }
-
-
-    protected function &getFlexProperties(): Collection
-    {
-        if (empty($this->flex_properties)) {
-            $this->flex_properties = Collection::make($this->flexProperties())
-                ->map(function ($property) {
-                    return $property->attach($this);
-                });
-        }
-
-        return $this->flex_properties;
+        return Collection::make($this->flexProperties())
+            ->mapWithKeys(function ($property) {
+                return [$property->name => $property->attach($this)];
+            })
+            ->toArray();
     }
 
     protected function queryFlexPropertyValues()
     {
         $query = $this->newQuery();
-
-
-
     }
 
     protected function addFlexPropertyJoin(Builder &$query, FlexProperty &$flexProperty)
@@ -244,39 +195,18 @@ trait HasFlexProperties
     {
         $this->hasFlexPropertyOrFail($name);
 
-        if ($this->currentLocale()) {
-            $values = [$this->currentLocale() => $values];
-        }
+        $this->getFlexProperty($name)->setValue($values);
 
+        /*
         foreach ($values as $locale=>$value) {
             if (! $this->hasFlexObject($name, $locale)) {
                 $this->flex_objects[$locale][$name] = $this->makeFlexObject($name, $locale);
             }
             $this->flexPropertyReference($name, $locale)->value = $value;
         }
+        */
 
         return $this;
-    }
-
-    /**
-     * Make flex property object.
-     *
-     * @param null  $name
-     * @param null  $locale
-     * @param array $attributes
-     *
-     * @throws FlexPropertyException
-     *
-     * @return FlexProperty
-     */
-    protected function makeFlexObject($name = null, $locale = null, $attributes = [])
-    {
-        $attributes = array_merge(
-            $attributes,
-            ['name' => $name, 'locale' => $locale ? $locale : $this->currentLocale()]
-        );
-
-        return Flex::factory($this->getFlexPropertyType($name), $attributes);
     }
 
     /**
@@ -293,21 +223,6 @@ trait HasFlexProperties
         return $this;
     }
 
-    public function nextLocale(string $locale = null)
-    {
-        $this->next_operation['locale'] = $locale;
-
-        return $this;
-    }
-
-    public function nextOperation(string $method, $arguments = [], $forward = false)
-    {
-        $on = $forward ? 'forward' : 'self';
-        $this->next_operation[$on][$method] = $arguments;
-
-        return $this;
-    }
-
     /**
      * Return the current flex property locale.
      *
@@ -315,9 +230,7 @@ trait HasFlexProperties
      */
     protected function currentLocale(): ?string
     {
-        return isset($this->next_operation['locale'])
-            ? $this->next_operation['locale']
-            : static::$locale['current'];
+        return static::$locale['current'];
     }
 
     /**
