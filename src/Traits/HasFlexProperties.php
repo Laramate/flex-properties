@@ -2,8 +2,12 @@
 
 namespace Laramate\FlexProperties\Traits;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Laramate\FlexProperties\Exceptions\FlexPropertyException;
 use Laramate\FlexProperties\Flex;
+use Laramate\FlexProperties\Interfaces\FlexProperty;
 use Mindtwo\DynamicMutators\Facades\Handler;
 
 trait HasFlexProperties
@@ -30,6 +34,8 @@ trait HasFlexProperties
     protected $flex_joins = [];
     protected $next_operation = [];
 
+    protected $flex_properties;
+
     /**
      * Boot trait.
      */
@@ -52,11 +58,6 @@ trait HasFlexProperties
         // Register event to store flex properties
         static::saved(function ($model) {
             $model->storeFlexProperties();
-        });
-
-        static::addGlobalScope('flex-property-join', function ($builder) {
-            return $builder;
-            $builder->flexProperties();
         });
     }
 
@@ -161,6 +162,7 @@ trait HasFlexProperties
      */
     public function getFlexProperty(string $name)
     {
+
         $this->hasFlexPropertyOrFail($name);
         $locale = $this->currentLocale();
 
@@ -170,6 +172,37 @@ trait HasFlexProperties
         }
 
         return $this->flexPropertyReference($name, $locale);
+    }
+
+
+    protected function &getFlexProperties(): Collection
+    {
+        if (empty($this->flex_properties)) {
+            $this->flex_properties = Collection::make($this->flexProperties())
+                ->map(function ($property) {
+                    return $property->attach($this);
+                });
+        }
+
+        return $this->flex_properties;
+    }
+
+    protected function queryFlexPropertyValues()
+    {
+        $query = $this->newQuery();
+
+
+
+    }
+
+    protected function addFlexPropertyJoin(Builder &$query, FlexProperty &$flexProperty)
+    {
+        $table = $flexProperty->getTable();
+
+        return $query->join($table, function (Builder $join) use ($table) {
+            return $join->on($table.'.linkable_id', '=', $this->getTable().'.id')
+                ->where('linkable_type', static::class);
+        });
     }
 
     public function hasFlexObject($name, $locale = null)

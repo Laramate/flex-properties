@@ -5,9 +5,11 @@ namespace Laramate\FlexProperties\Tests\Feature;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laramate\FlexProperties\Model;
 use Laramate\FlexProperties\Tests\TestCase;
-use Laramate\FlexProperties\Types\JsonFlexProperty;
-use Laramate\FlexProperties\Types\StringFlexProperty;
-use Laramate\FlexProperties\Types\TextFlexProperty;
+use Laramate\FlexProperties\Types2\Json;
+use Laramate\FlexProperties\Types2\JsonFlexProperty;
+use Laramate\FlexProperties\Types2\Longtext;
+use Laramate\FlexProperties\Types2\StringFlexProperty;
+use Laramate\FlexProperties\Types2\Text;
 
 class ModelTest extends TestCase
 {
@@ -16,19 +18,23 @@ class ModelTest extends TestCase
     protected function mockModel()
     {
         return new class() extends Model {
-            public $flex_properties = [
-                'string' => 'string',
-                'text'   => 'text',
-                'json'   => 'json',
-            ];
 
             protected $fillable = [
-                'string',
-                'text',
-                'json',
+                'text_example',
+                'longtext_example',
+                'json_example',
             ];
 
             public $id = 1;
+
+            public function flexProperties()
+            {
+                return [
+                    new Text('text_example'),
+                    new Longtext('longtext_example'),
+                    new Json('json_example'),
+                ];
+            }
 
             public function save(array $options = [])
             {
@@ -47,7 +53,7 @@ class ModelTest extends TestCase
         //dd($model);
 
         $this->assertInstanceOf(StringFlexProperty::class, $model->getFlexProperty('string'));
-        $this->assertInstanceOf(TextFlexProperty::class, $model->getFlexProperty('text'));
+        $this->assertInstanceOf(Text::class, $model->getFlexProperty('text'));
         $this->assertInstanceOf(JsonFlexProperty::class, $model->getFlexProperty('json'));
 
         $this->assertEquals('String example', $model->string);
@@ -70,7 +76,7 @@ class ModelTest extends TestCase
         $model->save();
 
         $this->assertEquals('String example', StringFlexProperty::first()->value);
-        $this->assertEquals('Text example', TextFlexProperty::first()->value);
+        $this->assertEquals('Text example', Text::first()->value);
         $this->assertEquals(['json', 'example'], JsonFlexProperty::first()->value);
     }
 
@@ -102,7 +108,7 @@ class ModelTest extends TestCase
         ]);
 
         $this->assertEquals('String example', StringFlexProperty::first()->value);
-        $this->assertEquals('Text example', TextFlexProperty::first()->value);
+        $this->assertEquals('Text example', Text::first()->value);
         $this->assertEquals(['json', 'example'], JsonFlexProperty::first()->value);
 
         $this->assertEquals('String example', $model->string);
@@ -129,7 +135,7 @@ class ModelTest extends TestCase
         $this->assertEquals(['json', 'updated'], $model->json);
 
         $this->assertEquals('String updated', StringFlexProperty::first()->value);
-        $this->assertEquals('Text updated', TextFlexProperty::first()->value);
+        $this->assertEquals('Text updated', Text::first()->value);
         $this->assertEquals(['json', 'updated'], JsonFlexProperty::first()->value);
     }
 

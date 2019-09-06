@@ -24,7 +24,8 @@
         "illuminate/database": "^5.8",
         "illuminate/support": "^5.8",
         "laramate/support": "*",
-        "mindtwo/laravel-dynamic-model-mutators": "^2.0"
+        "mindtwo/laravel-dynamic-model-mutators": "^2.0",
+      "ext-json": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
